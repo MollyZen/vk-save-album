@@ -5,9 +5,11 @@
 // @version     1
 // @require     http://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js
 // @require     https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/datejs/date.js
-// @grant       GM_xmlhttpRequest
+// @grant       GM.xmlHttpRequest
 // ==/UserScript==
 
+
+var token = 'INSERT VK API SERVICE TOKEN HERE';
 var settings = {
   language: 'en',
   date: {
@@ -35,14 +37,6 @@ var album_types = {
   '00': 'wall',
   '000': 'saved'
 };
-var photo_types = [
-  'photo_75',
-  'photo_130',
-  'photo_604',
-  'photo_807',
-  'photo_1280',
-  'photo_2560',
-];
 var images = '';
 var links = '';
 var openNew = function (title, content) {
@@ -52,8 +46,13 @@ var openNew = function (title, content) {
   html = html + content;
   html = html + '</div></body>';
   html = html + '</html>';
-  uri = 'data:text/html;charset=utf-8,' + encodeURIComponent(html);
-  newWindow = window.open(uri);
+  //uri = 'data:text/html;charset=utf-8,' + html;//encodeURIComponent(html);
+  const link = document.createElement("a");
+  const file = new Blob([html], { type: 'text/html' });
+  link.href = URL.createObjectURL(file);
+	link.download = title + ".html";
+	link.click();
+	URL.revokeObjectURL(link.href);
 };
 $(document).ready(function () {
   var data = window.location.toString().match(/^https:\/\/vk\.com\/album(\-?[0-9]+)\_([0-9]+)\??.*?$/);
@@ -72,11 +71,15 @@ $(document).on('click', '.vkopt-save', function () {
   var offset = 0;
   while (count === 0 || !all) {
     offset = loop * 1000;
-    var html = GM_xmlhttpRequest({
+    var html;
+    GM.xmlHttpRequest({
       synchronous: true,
       method: 'GET',
-      url: 'https://api.vk.com/method/photos.get?owner_id=' + owner + '&album_id=' + albumId + '&count=1000' + '&offset=' + offset + '&v=5.62',
-    }).responseText;
+      url: 'https://api.vk.com/method/photos.get?owner_id=' + owner + '&album_id=' + albumId + '&count=1000' + '&offset=' + offset + '&v=5.81' + '&access_token=' + token,
+			onload: function(response){
+        html = response.responseText;
+      }
+    });
     var json = $.parseJSON(html);
     if (json.hasOwnProperty('error')) {
       el.html('[error: ' + json.error.error_msg + ']');
@@ -87,12 +90,7 @@ $(document).on('click', '.vkopt-save', function () {
     date;
     for (id in items) {
       el.html('[' + phrases.wait + ' ' + count + '/' + json.response.count + ']');
-      for (var i = photo_types.length - 1; i >= 0; i--) {
-        if (items[id].hasOwnProperty([photo_types[i]])) {
-          url = items[id][photo_types[i]];
-          break;
-        }
-      }
+      url = items[id].sizes.slice(-1)[0].url;
       date = settings.date.type ? new Date(items[id]['date'] * 1000).toString(settings.date.format)  : '';
       if (settings.date.type == 2) images += date + '<br/>';
       images += '<img alt="' + date + '" title="' + date + '" src="' + url + '" />';
@@ -104,13 +102,13 @@ $(document).on('click', '.vkopt-save', function () {
     loop++;
   }
   el.html('<a class="vkopt-open-page">[' + phrases.open_page + ']</a><a class="vkopt-open-links">[' + phrases.get_links + ']</a>');
-  return false;
-});
-$(document).on('click', '.vkopt-open-page', function () {
+  $(document).on('click', '.vkopt-open-page', function () {
   openNew($('.photos_album_intro h1').html() + ' (owner id ' + owner + ', album id ' + album + ')', images);
   return false;
 });
 $(document).on('click', '.vkopt-open-links', function () {
   openNew($('.photos_album_intro h1').html() + ' (owner id ' + owner + ', album id' + album + ')', links);
+  return false;
+});
   return false;
 });
