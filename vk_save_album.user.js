@@ -106,7 +106,7 @@ $(document).on('click', '.vkopt-save', function () {
         date;
         for (id in items) {
           el.html('[' + phrases.wait + ' ' + count + '/' + json.response.count + ']');
-          url = items[id].sizes.slice(-1)[0].url;
+          url = items[id].orig_photo.url;
           date = settings.date.type ? new Date(items[id]['date'] * 1000).toString(settings.date.format)  : '';
           if (settings.date.type == 2) images += date + '<br/>';
           images += '<img alt="' + date + '" title="' + date + '" src="' + url + '" />';
