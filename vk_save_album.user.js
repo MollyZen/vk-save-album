@@ -109,7 +109,8 @@ $(document).on('click', '.vkopt-save', function () {
           url = items[id].orig_photo.url;
           date = settings.date.type ? new Date(items[id]['date'] * 1000).toString(settings.date.format)  : '';
           if (settings.date.type == 2) images += date + '<br/>';
-          images += '<img alt="' + date + '" title="' + date + '" src="' + url + '" />';
+          const image_upload_date = new Date(items[id]['date'] * 1000).toISOString()
+          images += '<figure><img alt="' + date + '" title="' + date + '" src="' + url + '" /><figcaption>' + items[id].text + '</figcaption><time datetime="' + image_upload_date + '"></time></figure>';
           if (settings.date.type == 2) images += '<br/>';
           links += url + '<br/>';
           count++;
