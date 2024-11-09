@@ -14,7 +14,8 @@ var settings = {
   language: 'en',
   date: {
     type: 1, // 0 - ''; 1 - only alt; 2 - text
-    format: 'dd.MM.yyyy'
+    format: 'yyyy.MM.dd-HH:mm:ss',
+    use_utc: true
   }
 };
 var i18n = {
@@ -39,6 +40,7 @@ var album_types = {
 };
 var images = '';
 var links = '';
+const timezone_offset = new Date().getTimezoneOffset()
 var openNew = function (title, content) {
   html = '<html>';
   html = html + '<head><title>' + title + '</title></head>';
@@ -107,7 +109,7 @@ $(document).on('click', '.vkopt-save', function () {
         for (id in items) {
           el.html('[' + phrases.wait + ' ' + count + '/' + json.response.count + ']');
           url = items[id].orig_photo.url;
-          date = settings.date.type ? new Date(items[id]['date'] * 1000).toString(settings.date.format)  : '';
+          date = settings.date.type ? new Date(items[id]['date'] * 1000 - (settings.date.use_utc ? timezone_offset * 60 * 1000 : 0) ).toString(settings.date.format)  : '';
           if (settings.date.type == 2) images += date + '<br/>';
           const image_upload_date = new Date(items[id]['date'] * 1000).toISOString()
           images += '<figure><img alt="' + date + '" title="' + date + '" src="' + url + '" /><figcaption>' + items[id].text + '</figcaption><time datetime="' + image_upload_date + '"></time></figure>';
