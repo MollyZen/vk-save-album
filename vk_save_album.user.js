@@ -2,7 +2,7 @@
 // @name        vk save album
 // @namespace   https://vk.com/album*
 // @include     https://vk.com/album*
-// @version     1
+// @version     2
 // @require     http://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js
 // @require     https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/datejs/date.js
 // @grant       GM.xmlHttpRequest
